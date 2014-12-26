@@ -1,0 +1,68 @@
+body {
+  margin: .5em auto .5em auto;
+  font-family : "Apple SD Gothic Neo","Malgun Gothic",Dotum,sans-serif
+}
+
+div.chart {
+  margin: 0 auto;
+}
+
+div.menu {
+  margin : 0 auto;
+  width : 100%;
+  font-size : 1.5em;
+  text-align: center;
+}
+
+div.menu input {
+  display : inline-block;
+  margin : 0 10px;
+}
+text.label{
+  font-size : 0.75em;
+}
+
+path.area {
+  fill-opacity : .15;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #111;
+}
+.axis text {
+  fill: #888;
+  font-size : 0.75em;
+}
+.axis + .axis g text {
+  display: none;
+
+}
+
+.axis line {
+  stroke: none;
+}
+
+.axis .minor {
+  stroke-opacity: .5;
+}
+
+path.area {
+  fill-opacity : 0.1;
+  stroke-width : 0;
+}
+
+path.line {
+  stroke-width : 1.5;
+  fill-opacity : 0.75;
+}
+
+.legend line {
+  stroke-opacity : 1.0;
+  stroke-width : 3.5;
+}
+
+.legend text{
+  font-size: 11px ;
+}
