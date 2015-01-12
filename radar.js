@@ -89,7 +89,7 @@ d3.radar = function module() {
       .domain([0, maxVal]);
 
       var barY = d3.scale.linear()
-      .domain([0, maxVal])
+      .domain([2.0, maxVal-1])
       .range([width*.1, 0]);
 
       var barX = d3.scale.ordinal()
@@ -251,16 +251,13 @@ d3.radar = function module() {
         lineInSmallBarSelect
         .enter().append('line')
         .attr("x1", function(d,i) {return barX(i)})
-        .attr("y1", barY(0))
+        .attr("y1", barY.range()[0])
         .attr("x2", function(d,i) {return barX(i)})
         .style("stroke-width", 1)
         .style("stroke", function(d,i) {return z[i]})
 
         lineInSmallBarSelect.transition()
         .duration(duration)
-
-
-        lineInSmallBarSelect
         .attr("y2", function(d,i) {return barY(d.value)})
 
 
@@ -269,7 +266,7 @@ d3.radar = function module() {
         textInSmallBarSelect
           .enter().append('text')
           .attr("x", function(d,i) {return barX(i)})
-          .attr("y", barY(0))
+          .attr("y", barY.range()[0])
           .attr("text-anchor", function(d,i){
             if (i==0) return "end"
             else if(i==zippedData[0].length-1) return "start"
