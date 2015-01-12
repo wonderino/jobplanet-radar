@@ -253,7 +253,7 @@ d3.radar = function module() {
         .attr("x1", function(d,i) {return barX(i)})
         .attr("y1", barY.range()[0])
         .attr("x2", function(d,i) {return barX(i)})
-        .style("stroke-width", 1)
+        .style("stroke-width", 2)
         .style("stroke", function(d,i) {return z[i]})
 
         lineInSmallBarSelect.transition()
