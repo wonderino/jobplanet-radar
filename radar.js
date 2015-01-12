@@ -9,29 +9,15 @@ d3.radarDataManager = function module() {
     'company_not_recommended': '비추천 리뷰',
   })
 
-  var categoryList = [{'name':'서비스업', 'number':100},
-  {'name':'제조/화학', 'number':200},
-  {'name':'의료/제약/복지', 'number':300},
-  {'name':'판매유통', 'number':400},
-  {'name':'교육업', 'number':500},
-  {'name':'건설업', 'number':600},
-  {'name':'IT/웹/통신', 'number':700},
-  {'name':'미디어/디자인', 'number':800},
-  {'name':'은행/금융업', 'number':900},
-  {'name':'기관/협회', 'number':1000}]
-
   exports.loadCsvData = function(_file, _callback) {
     function type(d) {
       for (var key in d) {
-        if(d.hasOwnProperty(key) && key !== 'type' ) {
+        if(d.hasOwnProperty(key) && key !== 'type' && key !== 'category_name') {
           d[key] = +d[key]
         }
       }
       if (d.category) {
-        d.type_kr = categoryList.filter(function(c) {
-          return (c.number == d.category)
-        })[0]['name']
-
+        d.type_kr = d.category_name
       } else {
         d.type_kr = nameMap.get(d.type)
       }
@@ -121,7 +107,6 @@ d3.radar = function module() {
             + "," + (margin.top + height/2) + ")"
           );
       }
-
 
       //d3.max([5.0, d3.max(_data, function(d) { return d.value; }) ])]);
       angle.domain((function() { var keys = labelMap.keys(); keys.push('-'); return keys})());
