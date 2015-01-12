@@ -1,0 +1,4 @@
+type,overall,advancement_rating,category,compensation_rating,culture_rating,management_rating,worklife_balance_rating
+company_recommended,3.75,3.5,,3.38,3.54,3.18,3.36
+company_not_recommended,2.53,2.67,,2.41,2.51,2.1,2.42
+default,3.06,3.03,,2.83,2.95,2.57,2.83
