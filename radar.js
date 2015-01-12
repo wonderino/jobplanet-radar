@@ -161,7 +161,7 @@ d3.radar = function module() {
 
 
       function update(targetData) {
-        var duration = 400;
+        var duration = 800;
         var areaSelect = svg.selectAll(".area")
           .data(targetData)
 
