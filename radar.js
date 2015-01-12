@@ -89,8 +89,8 @@ d3.radar = function module() {
       .domain([0, maxVal]);
 
       var barY = d3.scale.linear()
-      .domain([2.0, maxVal-1])
-      .range([width*.1, 0]);
+      .domain([1.0, maxVal-.5])
+      .range([width*.075, 0]);
 
       var barX = d3.scale.ordinal()
       .rangePoints([0, width*.025]);
