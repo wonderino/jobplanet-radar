@@ -284,6 +284,20 @@ d3.radar = function module() {
         .style("border-color", function(d,i) {
           return z[i];
         })
+        .on('click', function(d,i) {
+          var dist = d3.select(self).node().getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop) ;
+          d3.transition()
+            .duration(800)
+            .tween("scroll", (function(offset) {
+              return function() {
+                var fromTo = [window.pageYOffset || document.documentElement.scrollTop, offset]
+
+                var i = d3.interpolateNumber(fromTo[0], fromTo[1]);
+                return function(t) { scrollTo(0, i(t)); };
+              }
+            })(dist))
+          //window.scroll(0, d3.select(self).node().getBoundingClientRect().top);
+        })
         .on('change', function(d,i) {
           exports.targetData(_data[this.selectedIndex], i);
           update(targetData);
