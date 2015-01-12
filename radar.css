@@ -66,3 +66,8 @@ path.line {
 .legend text{
   font-size: 11px ;
 }
+
+select.targets {
+  margin : 10px 8px;
+  border : 2px solid;
+}
