@@ -54,7 +54,7 @@ d3.radar = function module() {
   }());
 
   var windowWidth;
-  var margin = {top: 20, right: 25, bottom: 20, left: 25};
+  var margin = {top: 50, right: 25, bottom: 20, left: 25};
   var tickNumber = 5;
   var maxVal = 5.0;
   var svg;
@@ -83,8 +83,17 @@ d3.radar = function module() {
 
       var angle = d3.scale.ordinal()
       .rangePoints([0, 2 * Math.PI]);
+
       var radius = d3.scale.linear()
       .range([0, outerRadius])
+      .domain([0, maxVal]);
+
+      var barY = d3.scale.linear()
+      .domain([0, maxVal])
+      .range([width*.1, 0]);
+
+      var barX = d3.scale.ordinal()
+      .rangePoints([0, width*.025]);
 
       var z = ['#1a468c', '#f9a33d', '#d13d30']
       var line = d3.svg.line.radial()
@@ -108,11 +117,13 @@ d3.radar = function module() {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform",
-          "translate(" + (margin.left + width/2) + "," + (margin.top + height/2) + ")");
+          "translate(" + (margin.left + width/2)
+            + "," + (margin.top + height/2) + ")"
+          );
       }
 
 
-      radius.domain([0, maxVal]);//d3.max([5.0, d3.max(_data, function(d) { return d.value; }) ])]);
+      //d3.max([5.0, d3.max(_data, function(d) { return d.value; }) ])]);
       angle.domain((function() { var keys = labelMap.keys(); keys.push('-'); return keys})());
 
       svg.selectAll(".axis")
@@ -152,7 +163,7 @@ d3.radar = function module() {
         .data(labelMap.keys())
       .enter().append('text')
       .attr("class", 'label')
-      .attr("x", function(d) {
+      .attr("x", function(d, i) {
         return (outerRadius + 20)* Math.cos(angle(d) - Math.PI*.5 )
       })
       .attr("y", function(d) {
@@ -162,6 +173,7 @@ d3.radar = function module() {
       .text(function(d) {
         return labelMap.get(d);
       })
+
 
       function update(targetData) {
         var duration = 400;
@@ -188,7 +200,6 @@ d3.radar = function module() {
         .duration(duration)
         .attr("d", function(d) { return line(d); })
 
-
         var pointSelect = svg.selectAll(".point")
           .data(targetData.reduce(
             function(pre,cur) {
@@ -208,6 +219,71 @@ d3.radar = function module() {
         .attr('cy', function(d) {
           return Math.sin(angle(d.name) - Math.PI*.5 ) * radius(d.value)
         })
+
+        /// bar chart
+        var zippedData = []
+        for (var i = 0; i < targetData[0].length ; i++ ) {
+          var tempArr = [];
+          for (var j= 0; j< targetData.length ; j++) {
+            tempArr.push(targetData[j][i])
+          }
+          zippedData.push(tempArr);
+        }
+
+        barX.domain(d3.range(zippedData[0].length));
+
+        var smallBarSelect = svg.selectAll(".bar")
+        .data(zippedData)
+
+        smallBarSelect.enter().append('g')
+        .attr("class", 'bar')
+        .attr("transform", function(d,i) {
+          var x = Math.cos(angle(d[0].name) - Math.PI*.5 ) * (outerRadius + 20)
+          var y = Math.sin(angle(d[0].name) - Math.PI*.5 ) * (outerRadius + 20)
+
+          if (i==0) y -= barY.range()[0] + 14
+          return "translate("+ x +","+ y + ")"
+        })
+
+        var lineInSmallBarSelect = smallBarSelect.selectAll("line")
+          .data(function(d){return d})
+
+        lineInSmallBarSelect
+        .enter().append('line')
+        .attr("x1", function(d,i) {return barX(i)})
+        .attr("y1", barY(0))
+        .attr("x2", function(d,i) {return barX(i)})
+        .style("stroke-width", 1)
+        .style("stroke", function(d,i) {return z[i]})
+
+        lineInSmallBarSelect.transition()
+        .duration(duration)
+
+
+        lineInSmallBarSelect
+        .attr("y2", function(d,i) {return barY(d.value)})
+
+
+        var textInSmallBarSelect = smallBarSelect.selectAll("text")
+          .data(function(d) { return d})
+        textInSmallBarSelect
+          .enter().append('text')
+          .attr("x", function(d,i) {return barX(i)})
+          .attr("y", barY(0))
+          .attr("text-anchor", function(d,i){
+            if (i==0) return "end"
+            else if(i==zippedData[0].length-1) return "start"
+            else return "middle"
+          })
+          .attr("dx", function(d,i){
+            if (i==0) return "-.35em"
+            else if(i==zippedData[0].length-1) return ".35em"
+            else return "0"
+          })
+          .style("fill", function(d,i){return z[i]})
+
+        textInSmallBarSelect.transition().duration(duration)
+          .text(function(d){return (Math.round(d.value*10)/10).toFixed(1)})
 
       }// end of update
 
@@ -248,7 +324,6 @@ d3.radar = function module() {
               }
             })
         })
-
       } // end of setSelects
 
       update(targetData);

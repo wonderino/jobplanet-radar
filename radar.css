@@ -54,8 +54,8 @@ path.area {
 }
 
 path.line {
-  stroke-width : 1.5;
-  fill-opacity : 0.75;
+  stroke-width : 1;
+  stroke-opacity : .75;
 }
 
 .legend line {
@@ -70,4 +70,8 @@ path.line {
 select.targets {
   margin : 10px 8px;
   border : 2px solid;
+}
+
+.bar text {
+  font-size: 10px;
 }
