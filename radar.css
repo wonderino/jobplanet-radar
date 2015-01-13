@@ -5,6 +5,7 @@ body {
 
 div.chart {
   margin: 0 auto;
+  font-weight : 100;
 }
 
 div.menu {
@@ -12,6 +13,7 @@ div.menu {
   width : 100%;
   font-size : 1.5em;
   text-align: center;
+
 }
 
 div.menu input {
