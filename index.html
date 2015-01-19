@@ -18,19 +18,17 @@
     </div>
   </div>
 
-
-
   <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="//d3js.org/d3.v3.min.js"></script>
   <script src="radar.js"></script>
   <script>
   var pathAndTargets = [
-  {path:'review_avgs_by_100.csv', target:'div.chart.radar.big_vs_small'}
-  //{path:'review_avgs_by_category.csv', target:'div.chart.radar.category'}
+  {path:'review_avgs_by_100.csv', target:'div.chart.radar.big_vs_small', nested:false},
+  {path:'review_avgs_by_category.csv', target:'div.chart.radar.category', nested:true}
   ]
   pathAndTargets.forEach(function(d,i){
     var chart = d3.radar();
-    chart.nested(true);
+    chart.nested(d.nested);
     var dataManager = d3.radarDataManager();
     dataManager.loadCsvData(d.path, function(data){
       d3.select(d.target)

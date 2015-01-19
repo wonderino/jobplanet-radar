@@ -109,23 +109,32 @@ d3.radar = function module() {
     className = className || 'targets';
     colIndex = colIndex || 0;
 
+    var dottedClassNames = className.split(' ').reduce(function(pre, next){
+      return pre+'.'+next
+    }, '')
+
     var selectSelects = d3.select(self)
     .select('div.menu')
-    .selectAll('.'+className+':nth-child(' + (colIndex+1) + ')')
+    .selectAll('select'+dottedClassNames)//+':nth-child(' + (colIndex+1) + ')')
       .data([options])
-    .enter().append('select')
+
+
+    selectSelects.enter().append('select')
     .attr("class", className)
     .style("border-color", function(d) {
       return z[colIndex];
     })
 
-    selectSelects.selectAll('option')
-    .data(function(d) {return d})
-    .enter().append('option')
+    var options = selectSelects.selectAll('option')
+    .data(function(d) {return d}, function(d) { return d.type})
+
+    options.enter().append('option')
     .attr("value", function(d) {return d.type})
     .html(function(d) {
       return d.type_kr
     })
+
+    options.exit().remove();
     return selectSelects
   }
 
@@ -133,7 +142,7 @@ d3.radar = function module() {
     selectNum = selectNum || 2
 
     d3.range(selectNum).forEach(function(colIndex) {
-      var selectSelect = getSelects(self, options, 'targets', colIndex);
+      var selectSelect = getSelects(self, options, 'targets first'+colIndex, colIndex);
       selectSelect.on('click', function() { //scroll to top
         scrollToTr(self);
       })
@@ -156,53 +165,55 @@ d3.radar = function module() {
       .key(function(d) { return d.first_category})
       .sortKeys(d3.ascending)
       .entries(options);
-
     d3.range(selectNum).forEach(function(colIndex) {
       var firstOptions = nestedSecondOptions.map(function(d) {return d.values[0]})
-      var firstSelect = getSelects(self, firstOptions, 'targets first', colIndex);
+      var firstSelect = getSelects(self, firstOptions, 'targets first'+colIndex, colIndex);
 
       firstSelect.on('click', function() { //scroll to top
         scrollToTr(self);
       })
       .on('change', function(d) {
-        //TODO: change the second select
         var selectedValue  = d3.event.target.value;
-        var secondOptions = nestedSecondOptions.filter(function(d) {return d.key==selectedValue})[0]
-        var secondSelect = getSelects(self, secondOptions, 'targets second', colIndex);
-        secondSelect.on('click', funtion() {
+        var secondOptions = nestedSecondOptions
+          .filter(function(d) {return ('company_category_'+d.key)===selectedValue})[0].values
+        var secondSelect = getSelects(self, secondOptions, 'targets second'+colIndex, colIndex);
+        secondSelect.on('click', function() {
           scrollToTr(self);
         }).on('change', function(d) {
           var selectedValue  = d3.event.target.value;
           var thisData = d.filter(function(d) {return d.type==selectedValue})[0]
           exports.targetData(thisData, colIndex);
           update(targetData);
-        }).each(function(d,i) {
+        }).selectAll('option')
+        .each(function(d,i) {
           if (i==0) {
             exports.targetData(d, colIndex); //set the initial target data
           }
         });
+        update(targetData);
       }) // end of first change
       .select('option:nth-child('+ (colIndex+1) + ')')
-      .attr('selected', true);
+      .attr('selected', true)
       .call(function(_select) {
         var secondOptions = nestedSecondOptions[colIndex].values;
-        var secondSelect = getSelects(self, secondOptions, 'targets second', colIndex);
-        secondSelect.on('click', funtion() {
+        var secondSelect = getSelects(self, secondOptions, 'targets second'+colIndex, colIndex);
+        secondSelect.on('click', function() {
           scrollToTr(self);
         }).on('change', function(d) {
           var selectedValue  = d3.event.target.value;
           var thisData = d.filter(function(d) {return d.type==selectedValue})[0]
           exports.targetData(thisData, colIndex);
           update(targetData);
-        }).each(function(d,i) {
+        }).selectAll('option')
+        .each(function(d,i) {
           if (i==0) {
             exports.targetData(d, colIndex); //set the initial target data
           }
         }); // end of second Selection
       }) // end of call
     }); // end of forEach
-  } // end of setNestedSelects
 
+  } // end of setNestedSelects
 
   function update(targetData) {
     var duration = 800;
