@@ -171,10 +171,10 @@ d3.radar = function module() {
       row.filter(function(d) { return d==='divider'})
       .html(function(d,i) {
         if(d =='divider') {
-          return '&#8675;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8675;'
+          return '&#8675;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8675;'
         }
       })
-    //
+
     var nestedSecondOptions = d3.nest()
       .key(function(d) { return d.first_category})
       .sortKeys(d3.ascending)
