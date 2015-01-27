@@ -18,12 +18,16 @@ div.menu {
 
 div.menu input {
   display : inline-block;
-  margin : 0 10px;
+  margin : 0 6px;
 }
+div.menu div.divider {
+  font-size : 14px;
+}
+
+
 text.label{
   font-size : 0.75em;
 }
-
 path.area {
   fill-opacity : .15;
 }
@@ -70,7 +74,7 @@ path.line {
 }
 
 select.targets {
-  margin : 10px 8px;
+  margin : 4px 4px;
   border : 3px solid;
 }
 

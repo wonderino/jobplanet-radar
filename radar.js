@@ -105,16 +105,17 @@ d3.radar = function module() {
     .tween('scroll', offset(dist))
   }
 
-  function getSelects(self, options, className, colIndex) {
+  function getSelects(self, options, className, colIndex, targetName) {
     className = className || 'targets';
     colIndex = colIndex || 0;
+    targetName = targetName || 'div.menu'
 
     var dottedClassNames = className.split(' ').reduce(function(pre, next){
       return pre+'.'+next
     }, '')
 
     var selectSelects = d3.select(self)
-    .select('div.menu')
+    .select(targetName)
     .selectAll('select'+dottedClassNames)//+':nth-child(' + (colIndex+1) + ')')
       .data([options])
 
@@ -139,7 +140,7 @@ d3.radar = function module() {
   }
 
   function setSelects(self, options, selectNum) {
-    selectNum = selectNum || 2
+    selectNum = selectNum || 2;
 
     d3.range(selectNum).forEach(function(colIndex) {
       var selectSelect = getSelects(self, options, 'targets first'+colIndex, colIndex);
@@ -159,16 +160,46 @@ d3.radar = function module() {
   } // end of setSelects
 
   function setNestedSelects(self, options,  selectNum) {
-    selectNum = selectNum || 2
+    selectNum = selectNum || 2;
 
+    // append divs in two rows
+    var row = d3.select(self).select('div.menu').selectAll('option_row')
+        .data(['first', 'divider' , 'second'])
+      .enter().append('div')
+      .attr('class', function(d) { return 'option_row '+d})
+
+      row.filter(function(d) { return d==='divider'})
+      .html(function(d,i) {
+        if(d =='divider') {
+          return '&#8675;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8675;'
+        }
+      })
+    //
     var nestedSecondOptions = d3.nest()
       .key(function(d) { return d.first_category})
       .sortKeys(d3.ascending)
       .entries(options);
+
+    var secondSelectFunc = function(_select, colIndex) {
+      _select.on('click', function() {
+        scrollToTr(self);
+      }).on('change', function(d) {
+        var selectedValue  = d3.event.target.value;
+        var thisData = d.filter(function(d) {return d.type==selectedValue})[0]
+        exports.targetData(thisData, colIndex);
+        update(targetData);
+      }).selectAll('option')
+      .each(function(d,i) {
+        if (i==0) {
+          exports.targetData(d, colIndex); //set the initial target data
+        }
+      });
+      return _select;
+    }
+
     d3.range(selectNum).forEach(function(colIndex) {
       var firstOptions = nestedSecondOptions.map(function(d) {return d.values[0]})
-      var firstSelect = getSelects(self, firstOptions, 'targets first'+colIndex, colIndex);
-
+      var firstSelect = getSelects(self, firstOptions, 'targets first'+colIndex, colIndex, 'div.menu > div.first');
       firstSelect.on('click', function() { //scroll to top
         scrollToTr(self);
       })
@@ -176,43 +207,19 @@ d3.radar = function module() {
         var selectedValue  = d3.event.target.value;
         var secondOptions = nestedSecondOptions
           .filter(function(d) {return ('company_category_'+d.key)===selectedValue})[0].values
-        var secondSelect = getSelects(self, secondOptions, 'targets second'+colIndex, colIndex);
-        secondSelect.on('click', function() {
-          scrollToTr(self);
-        }).on('change', function(d) {
-          var selectedValue  = d3.event.target.value;
-          var thisData = d.filter(function(d) {return d.type==selectedValue})[0]
-          exports.targetData(thisData, colIndex);
-          update(targetData);
-        }).selectAll('option')
-        .each(function(d,i) {
-          if (i==0) {
-            exports.targetData(d, colIndex); //set the initial target data
-          }
-        });
+        var secondSelect = getSelects(self, secondOptions, 'targets second'+colIndex, colIndex, 'div.menu > div.second');
+        secondSelect.call(secondSelectFunc, colIndex);
         update(targetData);
       }) // end of first change
       .select('option:nth-child('+ (colIndex+1) + ')')
       .attr('selected', true)
       .call(function(_select) {
         var secondOptions = nestedSecondOptions[colIndex].values;
-        var secondSelect = getSelects(self, secondOptions, 'targets second'+colIndex, colIndex);
-        secondSelect.on('click', function() {
-          scrollToTr(self);
-        }).on('change', function(d) {
-          var selectedValue  = d3.event.target.value;
-          var thisData = d.filter(function(d) {return d.type==selectedValue})[0]
-          exports.targetData(thisData, colIndex);
-          update(targetData);
-        }).selectAll('option')
-        .each(function(d,i) {
-          if (i==0) {
-            exports.targetData(d, colIndex); //set the initial target data
-          }
-        }); // end of second Selection
+        var secondSelect = getSelects(self, secondOptions, 'targets second'+colIndex, colIndex, 'div.menu > div.second');
+        secondSelect.call(secondSelectFunc, colIndex)// end of second Selection
       }) // end of call
-    }); // end of forEach
 
+    }); // end of forEach
   } // end of setNestedSelects
 
   function update(targetData) {
@@ -354,7 +361,7 @@ d3.radar = function module() {
       } else {
         setSelects(self, data, 2)
       }
-      //targetData = _data.slice(0, 2).map(getLabelsOnly)
+
       if (!svg) {
         svg = d3.select(self).append("svg")
         .attr("class", "canvas")
